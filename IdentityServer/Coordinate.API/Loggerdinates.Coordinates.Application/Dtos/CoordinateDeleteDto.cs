@@ -6,10 +6,8 @@ using System.Threading.Tasks;
 
 namespace Loggerdinates.Coordinates.Application.Dtos
 {
-    public class CoordinateInformationDto
+    public class CoordinateDeleteDto
     {
-        public string Name { get; set; }
-        public string Latitude { get; set; }
-        public string Longitude { get; set; }
+        public int Id { get; set; }
     }
 }

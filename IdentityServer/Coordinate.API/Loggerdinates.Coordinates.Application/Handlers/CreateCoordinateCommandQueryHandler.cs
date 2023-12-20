@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Loggerdinates.Coordinates.Application.Handlers
 {
-    public class CreateCoordinateCommandQueryHandler : IRequestHandler<CreateCoordinateCommandQuery, Response<CoordinateDto>>
+    public class CreateCoordinateCommandQueryHandler : IRequestHandler<CreateCoordinateCommandQuery, Response<CoordinateCreateDto>>
     {
         private readonly CoordinateDbContext _context;
 
@@ -21,15 +21,15 @@ namespace Loggerdinates.Coordinates.Application.Handlers
             _context = context;
         }
 
-        public async Task<Response<CoordinateDto>> Handle(CreateCoordinateCommandQuery request, CancellationToken cancellationToken)
+        public async Task<Response<CoordinateCreateDto>> Handle(CreateCoordinateCommandQuery request, CancellationToken cancellationToken)
         {
             var coordinateInformation = new CoordinateInformation(request.CoordinateInformation.Name,request.CoordinateInformation.Latitude,request.CoordinateInformation.Longitude);
             var coordinateItem = new Coordinate(request.CreatedBy, coordinateInformation);
 
-            await _context.AddAsync(coordinateItem);
+            await _context.Coordinates.AddAsync(coordinateItem);
             await _context.SaveChangesAsync();
 
-            return Response<CoordinateDto>.Success(new CoordinateDto { CoordinateInformation = request.CoordinateInformation, CreatedBy = request.CreatedBy }, 200);
+            return Response<CoordinateCreateDto>.Success(new CoordinateCreateDto { CoordinateInformation = request.CoordinateInformation, CreatedBy = request.CreatedBy }, 200);
         }
     }
 }

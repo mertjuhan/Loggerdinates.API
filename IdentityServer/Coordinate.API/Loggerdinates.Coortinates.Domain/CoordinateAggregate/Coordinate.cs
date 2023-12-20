@@ -9,7 +9,7 @@ namespace Loggerdinates.Coortinates.Domain.CoordinateAggregate
 {
     public class Coordinate : Entity,IAggregateRoot
     {
-        public DateTime CreatedDate { get; private set; } = DateTime.Now;
+        public DateTime CreatedDate { get; private set; }
         public string CreatedBy { get; private set; }
 
         /// OWNED ENTITY TYPE !!
@@ -21,6 +21,7 @@ namespace Loggerdinates.Coortinates.Domain.CoordinateAggregate
         {
             CreatedBy = createdBy;
             CoordinateInformation = coordinateInformation;
+            CreatedDate = DateTime.UtcNow;
         }
     }
 }

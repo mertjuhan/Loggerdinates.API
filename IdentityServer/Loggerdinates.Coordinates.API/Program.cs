@@ -1,12 +1,24 @@
 using Loggerdinates.Coordinates.Infrastructure.Persistence;
 using Loggerdinates.Shared.Services;
 using MediatR;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
+using System.IdentityModel.Tokens.Jwt;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
+var requireAuthorizePolicy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
+JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Remove("sub");
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(opt =>
+{
+    opt.Authority = builder.Configuration["IdentityServerUrl"];
+    opt.Audience = "resource_api1";
+    opt.RequireHttpsMetadata = true;
+});
 builder.Services.AddDbContext<CoordinateDbContext>(opt =>
 {
     opt.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")
@@ -15,13 +27,17 @@ builder.Services.AddDbContext<CoordinateDbContext>(opt =>
             configure.MigrationsAssembly("Loggerdinates.Coordinates.Infrastructure");
         });
 });
-builder.Services.AddMediatR(typeof(Loggerdinates.Coordinates.Application.Handlers.CreateCoordinateCommandQueryHandler).Assembly);
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ISharedIdentityService, SharedIdentityService>();
-builder.Services.AddControllers();
+builder.Services.AddMediatR(typeof(Loggerdinates.Coordinates.Application.Handlers.CreateCoordinateCommandQueryHandler).Assembly);
+builder.Services.AddControllers(opt =>
+{
+    opt.Filters.Add(new AuthorizeFilter(requireAuthorizePolicy));
+});
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddHttpContextAccessor();
+
 
 var app = builder.Build();
 
@@ -33,7 +49,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

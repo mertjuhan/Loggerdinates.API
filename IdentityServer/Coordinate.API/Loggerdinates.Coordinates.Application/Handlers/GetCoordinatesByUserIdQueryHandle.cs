@@ -26,7 +26,7 @@ namespace Loggerdinates.Coordinates.Application.Handlers
         {
             var coordinates = await _context.Coordinates.Where(x=>x.CreatedBy == request.UserId).ToListAsync();
 
-            if(coordinates.Any())
+            if(!coordinates.Any())
             {
                 return Response<List<CoordinateDto>>.Success(new List<CoordinateDto>(), statusCode: 200);
             }

@@ -9,9 +9,8 @@ using System.Threading.Tasks;
 
 namespace Loggerdinates.Coordinates.Application.Commands
 {
-    public class CreateCoordinateCommandQuery : IRequest<Response<CoordinateCreateDto>>
+    public class DeleteCoordinateCommandQuery : IRequest<Response<CoordinateDeleteDto>>
     {
-        public string CreatedBy { get; set; }
-        public CoordinateInformationDto CoordinateInformation { get; set; }
+        public int Id { get; set; }
     }
 }
